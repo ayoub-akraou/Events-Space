@@ -19,6 +19,11 @@ enum Role {
   PARTICIPANT
 }
 
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELED
+}
 
 model User {
   id           String   @id @default(uuid())
@@ -37,5 +42,34 @@ model User {
   decisions     Reservation[]  @relation("ReservationsDecidedBy")
 
   @@map("users")
+}
+
+model Event {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  startAt     DateTime    @map("start_at")
+  endAt       DateTime?   @map("end_at")
+  status      EventStatus @default(DRAFT)
+
+  capacityMax Int         @map("capacity_max")
+  publishedAt DateTime?   @map("published_at")
+  canceledAt  DateTime?   @map("canceled_at")
+
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // relations
+  createdById String   @map("created_by")
+  createdBy   User     @relation("EventsCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+
+  locationId  String   @map("location_id")
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  reservations Reservation[]
+
+  @@index([startAt])
+  @@index([status])
+  @@map("events")
 }
 

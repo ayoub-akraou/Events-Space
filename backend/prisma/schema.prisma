@@ -11,3 +11,31 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+
+
+enum Role {
+  ADMIN
+  PARTICIPANT
+}
+
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String?  @map("full_name")
+  phone        String?
+  role         Role     @default(PARTICIPANT)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // relations
+  createdEvents Event[]        @relation("EventsCreatedBy")
+  reservations  Reservation[]  @relation("ReservationsByUser")
+  decisions     Reservation[]  @relation("ReservationsDecidedBy")
+
+  @@map("users")
+}
+

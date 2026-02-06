@@ -1,66 +1,39 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500" />
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Events</p>
-            <p className="text-lg font-semibold">Events Space</p>
-          </div>
-        </div>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
-          <a className="hover:text-slate-900" href="/events">
-            Événements
-          </a>
-          <a className="hover:text-slate-900" href="/reservations">
-            Mes réservations
-          </a>
-          <a className="hover:text-slate-900" href="/admin">
-            Admin
-          </a>
-        </nav>
-        <div className="flex items-center gap-3">
-          <a
-            className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400"
-            href="/login"
-          >
-            Connexion
-          </a>
-          <a
-            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5"
-            href="/register"
-          >
-            Créer un compte
-          </a>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-6xl px-6 pb-20 pt-8">
+      <main className="mx-auto w-full max-w-6xl px-6 pb-20 pt-12">
         <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div className="space-y-6">
             <span className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-800">
               Nouveau catalogue
             </span>
             <h1 className="text-4xl font-semibold leading-tight text-slate-900 md:text-5xl">
-              Planifie, découvre et réserve des événements en quelques minutes.
+              Planifie, decouvre et reserve des evenements en quelques minutes.
             </h1>
             <p className="text-lg leading-relaxed text-slate-600">
-              Events Space centralise les événements publics et privés, propose des réservations
-              simplifiées et donne aux administrateurs une vision claire de la participation.
+              Events Space centralise les evenements publics et prives, propose des reservations
+              simplifiees et donne aux administrateurs une vision claire de la participation.
             </p>
             <div className="flex flex-wrap items-center gap-4">
-              <button className="rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/30 transition hover:-translate-y-0.5">
-                Explorer les événements
-              </button>
-              <button className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400">
-                Voir comment ça marche
-              </button>
+              <Link
+                className="rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/30 transition hover:-translate-y-0.5"
+                href="/events"
+              >
+                Explorer les evenements
+              </Link>
+              <Link
+                className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+                href="/register"
+              >
+                Creer un compte
+              </Link>
             </div>
             <div className="flex flex-wrap gap-6 pt-4 text-sm text-slate-600">
               <div>
                 <p className="text-2xl font-semibold text-slate-900">120+</p>
-                <p>événements actifs</p>
+                <p>evenements actifs</p>
               </div>
               <div>
                 <p className="text-2xl font-semibold text-slate-900">98%</p>
@@ -68,7 +41,7 @@ export default function Home() {
               </div>
               <div>
                 <p className="text-2xl font-semibold text-slate-900">24/7</p>
-                <p>accès mobile</p>
+                <p>acces mobile</p>
               </div>
             </div>
           </div>
@@ -84,9 +57,9 @@ export default function Home() {
               </div>
               <div className="mt-6 space-y-4">
                 {[
-                  { title: "Atelier Design Sprint", date: "Lun 12 Févr", city: "Casablanca" },
-                  { title: "Conférence Tech & AI", date: "Mer 14 Févr", city: "Rabat" },
-                  { title: "Meetup Produit", date: "Ven 16 Févr", city: "Tanger" },
+                  { title: "Atelier Design Sprint", date: "Lun 12 Fevr", city: "Casablanca" },
+                  { title: "Conference Tech & AI", date: "Mer 14 Fevr", city: "Rabat" },
+                  { title: "Meetup Produit", date: "Ven 16 Fevr", city: "Tanger" },
                 ].map((event) => (
                   <div
                     key={event.title}
@@ -107,16 +80,16 @@ export default function Home() {
         <section className="mt-16 grid gap-6 md:grid-cols-3">
           {[
             {
-              title: "Réservation express",
-              desc: "Un parcours clair avec validation instantanée et suivi des statuts.",
+              title: "Reservation express",
+              desc: "Un parcours clair avec validation instantanee et suivi des statuts.",
             },
             {
               title: "Tableau de bord admin",
-              desc: "Suivez les confirmations, les refus et les annulations en temps réel.",
+              desc: "Suivez les confirmations, les refus et les annulations en temps reel.",
             },
             {
               title: "Tickets PDF",
-              desc: "Téléchargez un ticket officiel dès qu’une réservation est confirmée.",
+              desc: "Telechargez un ticket officiel des qu'une reservation est confirmee.",
             },
           ].map((feature) => (
             <div
@@ -132,3 +105,4 @@ export default function Home() {
     </div>
   );
 }
+

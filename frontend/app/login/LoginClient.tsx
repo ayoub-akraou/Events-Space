@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { getApiBase } from "../../lib/api";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useAuth } from "../providers/AuthProvider";
 
 type LoginState = {
   email: string;
@@ -9,11 +11,30 @@ type LoginState = {
 };
 
 export default function LoginClient() {
-  const apiBase = getApiBase();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
+  const registered = searchParams.get("registered") === "1";
+  const prefillEmail = searchParams.get("email") ?? "";
+
+  const { user, isLoading: authLoading, login } = useAuth();
+  const next = nextParam ?? (user?.role === "ADMIN" ? "/admin" : "/events");
   const [form, setForm] = useState<LoginState>({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (prefillEmail && !form.email) {
+      setForm((prev) => ({ ...prev, email: prefillEmail }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillEmail]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace(next);
+    }
+  }, [authLoading, user, next, router]);
 
   const handleChange = (field: keyof LoginState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -21,22 +42,13 @@ export default function LoginClient() {
 
   const handleSubmit = async () => {
     setError(null);
-    setSuccess(false);
     setLoading(true);
     try {
-      const res = await fetch(`${apiBase}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
+      const res = await login(form.email, form.password);
       if (!res.ok) {
-        throw new Error("Identifiants invalides.");
+        throw new Error(res.message);
       }
-
-      const data = (await res.json()) as { access_token: string };
-      window.localStorage.setItem("events-space-token", data.access_token);
-      setSuccess(true);
+      router.push(next);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -47,7 +59,13 @@ export default function LoginClient() {
   return (
     <div className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl shadow-slate-900/5">
       <h1 className="text-3xl font-semibold text-slate-900">Connexion</h1>
-      <p className="mt-2 text-sm text-slate-600">Connecte-toi pour accéder à tes réservations.</p>
+      <p className="mt-2 text-sm text-slate-600">Connecte-toi pour acceder a tes reservations.</p>
+
+      {registered && (
+        <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          Compte cree avec succes. Connecte-toi maintenant.
+        </div>
+      )}
 
       <div className="mt-6 grid gap-4">
         <input
@@ -70,19 +88,21 @@ export default function LoginClient() {
           {error}
         </div>
       )}
-      {success && (
-        <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          Connexion réussie.
-        </div>
-      )}
 
       <button
         className="mt-6 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5"
         onClick={handleSubmit}
-        disabled={loading}
+        disabled={loading || authLoading}
       >
-        {loading ? "Connexion..." : "Se connecter"}
+        {loading || authLoading ? "Connexion..." : "Se connecter"}
       </button>
+
+      <p className="mt-6 text-sm text-slate-600">
+        Pas de compte ?{" "}
+        <Link className="font-semibold text-slate-900 underline" href="/register">
+          Creer un compte
+        </Link>
+      </p>
     </div>
   );
 }

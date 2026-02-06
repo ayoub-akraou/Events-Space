@@ -5,12 +5,13 @@ export default function ReservationsPage() {
     <div className="mx-auto w-full max-w-5xl px-6 py-12">
       <header className="mb-8">
         <p className="text-xs uppercase tracking-[0.35em] text-slate-500">Espace participant</p>
-        <h1 className="text-4xl font-semibold text-slate-900">Mes réservations</h1>
+        <h1 className="text-4xl font-semibold text-slate-900">Mes reservations</h1>
         <p className="mt-3 text-base text-slate-600">
-          Suis l'avancement de tes demandes et télécharge tes tickets confirmés.
+          Suis l'avancement de tes demandes et telecharge tes tickets confirmes.
         </p>
       </header>
       <ReservationsClient />
     </div>
   );
 }
+

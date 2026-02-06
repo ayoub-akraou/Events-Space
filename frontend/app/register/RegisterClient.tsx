@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { getApiBase } from "../../lib/api";
 
 type RegisterState = {
@@ -14,6 +15,7 @@ type RegisterState = {
 export default function RegisterClient() {
   const apiBase = getApiBase();
   const router = useRouter();
+
   const [form, setForm] = useState<RegisterState>({
     email: "",
     password: "",
@@ -46,19 +48,20 @@ export default function RegisterClient() {
 
       if (!res.ok) {
         if (res.status === 409) {
-          throw new Error("Cet email est déjà utilisé.");
+          throw new Error("Cet email est deja utilise.");
         }
         if (res.status === 400) {
-          throw new Error("Données invalides. Vérifie les champs.");
+          throw new Error("Donnees invalides. Verifie les champs.");
         }
-        throw new Error("Impossible de créer le compte.");
+        throw new Error("Impossible de creer le compte.");
       }
 
       await res.json();
       setSuccess(true);
       window.setTimeout(() => {
-        router.push("/login");
-      }, 800);
+        const email = encodeURIComponent(form.email);
+        router.push(`/login?registered=1&email=${email}`);
+      }, 700);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -68,9 +71,9 @@ export default function RegisterClient() {
 
   return (
     <div className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl shadow-slate-900/5">
-      <h1 className="text-3xl font-semibold text-slate-900">Créer un compte</h1>
+      <h1 className="text-3xl font-semibold text-slate-900">Creer un compte</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Rejoins Events Space pour réserver et gérer tes événements.
+        Rejoins Events Space pour reserver et gerer tes evenements.
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -82,7 +85,7 @@ export default function RegisterClient() {
         />
         <input
           className="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-          placeholder="Téléphone"
+          placeholder="Telephone"
           value={form.phone}
           onChange={(event) => handleChange("phone", event.target.value)}
         />
@@ -108,7 +111,7 @@ export default function RegisterClient() {
       )}
       {success && (
         <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          Compte créé avec succès. Tu es connecté.
+          Compte cree avec succes. Redirection vers la page de connexion...
         </div>
       )}
 
@@ -117,8 +120,16 @@ export default function RegisterClient() {
         onClick={handleSubmit}
         disabled={loading}
       >
-        {loading ? "Création..." : "Créer mon compte"}
+        {loading ? "Creation..." : "Creer mon compte"}
       </button>
+
+      <p className="mt-6 text-sm text-slate-600">
+        Deja un compte ?{" "}
+        <Link className="font-semibold text-slate-900 underline" href="/login">
+          Connexion
+        </Link>
+      </p>
     </div>
   );
 }
+

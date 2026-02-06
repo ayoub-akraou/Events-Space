@@ -1,8 +1,16 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { EventStatus, ReservationStatus } from '@prisma/client';
+import { EventStatus, ReservationStatus, Role } from '@prisma/client';
 import { AdminDecisionDto } from './dto/admin-decision.dto';
+import { CancelReservationDto } from './dto/cancel-reservation.dto';
+import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 
 @Injectable()
 export class ReservationsService {
@@ -116,6 +124,40 @@ export class ReservationsService {
         refusedAt: new Date(),
         decidedById: adminId,
         adminNote: dto.adminNote,
+      },
+      include: { event: true, user: true },
+    });
+  }
+
+  async cancelReservation(
+    reservationId: string,
+    user: CurrentUserPayload,
+    dto: CancelReservationDto,
+  ) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Réservation introuvable');
+    }
+
+    const isAdmin = user.role === Role.ADMIN;
+    if (!isAdmin && reservation.userId !== user.userId) {
+      throw new ForbiddenException('Accès interdit');
+    }
+
+    if (reservation.status === ReservationStatus.CANCELED) {
+      throw new BadRequestException('Réservation déjà annulée');
+    }
+
+    return this.prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        status: ReservationStatus.CANCELED,
+        canceledAt: new Date(),
+        cancelReason: dto.cancelReason,
+        decidedById: isAdmin ? user.userId : null,
       },
       include: { event: true, user: true },
     });

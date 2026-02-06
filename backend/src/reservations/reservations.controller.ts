@@ -7,6 +7,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { AdminDecisionDto } from './dto/admin-decision.dto';
+import { CancelReservationDto } from './dto/cancel-reservation.dto';
 import { ReservationsService } from './reservations.service';
 
 @Controller('reservations')
@@ -45,5 +46,15 @@ export class ReservationsController {
     @CurrentUser() user: CurrentUserPayload,
   ) {
     return this.reservations.refuseReservation(id, user.userId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/cancel')
+  cancel(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: CancelReservationDto,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.reservations.cancelReservation(id, user, dto);
   }
 }

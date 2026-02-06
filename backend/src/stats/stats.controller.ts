@@ -15,4 +15,11 @@ export class StatsController {
   getOverview() {
     return this.stats.getOverview();
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('occupancy')
+  getOccupancy() {
+    return this.stats.getOccupancyRates();
+  }
 }

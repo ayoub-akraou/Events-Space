@@ -38,4 +38,37 @@ export class StatsService {
       canceledReservations,
     };
   }
+
+  async getOccupancyRates() {
+    const events = await this.prisma.event.findMany({
+      where: { status: EventStatus.PUBLISHED },
+      select: { id: true, title: true, capacityMax: true, startAt: true },
+      orderBy: { startAt: 'asc' },
+    });
+
+    const eventIds = events.map((event) => event.id);
+    const counts = await this.prisma.reservation.groupBy({
+      by: ['eventId'],
+      where: { eventId: { in: eventIds }, status: ReservationStatus.CONFIRMED },
+      _count: { _all: true },
+    });
+
+    const confirmedByEvent = new Map<string, number>(
+      counts.map((count) => [count.eventId, count._count._all]),
+    );
+
+    return events.map((event) => {
+      const confirmed = confirmedByEvent.get(event.id) ?? 0;
+      const fillRate = event.capacityMax > 0 ? confirmed / event.capacityMax : 0;
+
+      return {
+        eventId: event.id,
+        title: event.title,
+        capacityMax: event.capacityMax,
+        confirmed,
+        fillRate,
+        startAt: event.startAt,
+      };
+    });
+  }
 }

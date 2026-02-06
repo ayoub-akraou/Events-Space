@@ -1,4 +1,4 @@
-import { Body, Controller, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
@@ -39,5 +39,10 @@ export class EventsController {
   @Post(':id/cancel')
   cancel(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.events.cancelEvent(id);
+  }
+
+  @Get()
+  listPublished() {
+    return this.events.listPublishedEvents();
   }
 }

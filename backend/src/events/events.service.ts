@@ -117,4 +117,35 @@ export class EventsService {
       },
     });
   }
+
+  async listPublishedEvents() {
+    const events = await this.prisma.event.findMany({
+      where: { status: EventStatus.PUBLISHED },
+      orderBy: { startAt: 'asc' },
+      include: {
+        location: true,
+      },
+    });
+
+    const eventIds = events.map((event) => event.id);
+    const counts = await this.prisma.reservation.groupBy({
+      by: ['eventId'],
+      where: {
+        eventId: { in: eventIds },
+        status: 'CONFIRMED',
+      },
+      _count: {
+        _all: true,
+      },
+    });
+
+    const confirmedByEvent = new Map<string, number>(
+      counts.map((count) => [count.eventId, count._count._all]),
+    );
+
+    return events.map((event) => ({
+      ...event,
+      remainingCapacity: event.capacityMax - (confirmedByEvent.get(event.id) ?? 0),
+    }));
+  }
 }

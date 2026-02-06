@@ -8,6 +8,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { EventStatus, ReservationStatus, Role } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import { AdminDecisionDto } from './dto/admin-decision.dto';
 import { CancelReservationDto } from './dto/cancel-reservation.dto';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
@@ -161,5 +162,36 @@ export class ReservationsService {
       },
       include: { event: true, user: true },
     });
+  }
+
+  async getTicketData(reservationId: string, user: CurrentUserPayload) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+      include: { event: { include: { location: true } }, user: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Réservation introuvable');
+    }
+    if (reservation.status !== ReservationStatus.CONFIRMED) {
+      throw new BadRequestException('Ticket indisponible');
+    }
+
+    const isAdmin = user.role === Role.ADMIN;
+    if (!isAdmin && reservation.userId !== user.userId) {
+      throw new ForbiddenException('Accès interdit');
+    }
+
+    if (!reservation.ticketCode) {
+      const ticketCode = randomUUID();
+      const updated = await this.prisma.reservation.update({
+        where: { id: reservationId },
+        data: { ticketCode },
+        include: { event: { include: { location: true } }, user: true },
+      });
+      return updated;
+    }
+
+    return reservation;
   }
 }

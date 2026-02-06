@@ -35,4 +35,15 @@ export class ReservationsController {
   ) {
     return this.reservations.confirmReservation(id, user.userId, dto);
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Post(':id/refuse')
+  refuse(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: AdminDecisionDto,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
+    return this.reservations.refuseReservation(id, user.userId, dto);
+  }
 }

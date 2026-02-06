@@ -95,4 +95,29 @@ export class ReservationsService {
       include: { event: true, user: true },
     });
   }
+
+  async refuseReservation(reservationId: string, adminId: string, dto: AdminDecisionDto) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+      select: { id: true, status: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Réservation introuvable');
+    }
+    if (reservation.status !== ReservationStatus.PENDING) {
+      throw new BadRequestException('Réservation non refusable');
+    }
+
+    return this.prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        status: ReservationStatus.REFUSED,
+        refusedAt: new Date(),
+        decidedById: adminId,
+        adminNote: dto.adminNote,
+      },
+      include: { event: true, user: true },
+    });
+  }
 }

@@ -148,4 +148,24 @@ export class EventsService {
       remainingCapacity: event.capacityMax - (confirmedByEvent.get(event.id) ?? 0),
     }));
   }
+
+  async getPublishedEventDetail(eventId: string) {
+    const event = await this.prisma.event.findFirst({
+      where: { id: eventId, status: EventStatus.PUBLISHED },
+      include: { location: true },
+    });
+
+    if (!event) {
+      return null;
+    }
+
+    const confirmedCount = await this.prisma.reservation.count({
+      where: { eventId, status: 'CONFIRMED' },
+    });
+
+    return {
+      ...event,
+      remainingCapacity: event.capacityMax - confirmedCount,
+    };
+  }
 }

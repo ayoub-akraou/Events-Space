@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
@@ -44,5 +54,14 @@ export class EventsController {
   @Get()
   listPublished() {
     return this.events.listPublishedEvents();
+  }
+
+  @Get(':id')
+  async detail(@Param('id', new ParseUUIDPipe()) id: string) {
+    const event = await this.events.getPublishedEventDetail(id);
+    if (!event) {
+      throw new NotFoundException('Événement introuvable');
+    }
+    return event;
   }
 }

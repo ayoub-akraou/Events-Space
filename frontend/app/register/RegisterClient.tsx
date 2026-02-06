@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getApiBase } from "../../lib/api";
 
 type RegisterState = {
@@ -12,6 +13,7 @@ type RegisterState = {
 
 export default function RegisterClient() {
   const apiBase = getApiBase();
+  const router = useRouter();
   const [form, setForm] = useState<RegisterState>({
     email: "",
     password: "",
@@ -52,9 +54,11 @@ export default function RegisterClient() {
         throw new Error("Impossible de créer le compte.");
       }
 
-      const data = (await res.json()) as { access_token: string };
-      window.localStorage.setItem("events-space-token", data.access_token);
+      await res.json();
       setSuccess(true);
+      window.setTimeout(() => {
+        router.push("/login");
+      }, 800);
     } catch (err) {
       setError((err as Error).message);
     } finally {

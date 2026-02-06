@@ -21,9 +21,12 @@ export default function Home() {
           </a>
         </nav>
         <div className="flex items-center gap-3">
-          <button className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400">
+          <a
+            className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400"
+            href="/login"
+          >
             Connexion
-          </button>
+          </a>
           <a
             className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5"
             href="/register"

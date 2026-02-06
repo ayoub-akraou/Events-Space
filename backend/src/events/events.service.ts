@@ -101,4 +101,20 @@ export class EventsService {
       },
     });
   }
+
+  cancelEvent(eventId: string) {
+    return this.prisma.event.update({
+      where: { id: eventId },
+      data: {
+        status: EventStatus.CANCELED,
+        canceledAt: new Date(),
+      },
+      select: {
+        id: true,
+        status: true,
+        canceledAt: true,
+        updatedAt: true,
+      },
+    });
+  }
 }

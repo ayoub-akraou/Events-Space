@@ -33,4 +33,11 @@ export class EventsController {
   publish(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.events.publishEvent(id);
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Post(':id/cancel')
+  cancel(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.events.cancelEvent(id);
+  }
 }

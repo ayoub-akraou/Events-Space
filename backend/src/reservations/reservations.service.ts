@@ -47,4 +47,16 @@ export class ReservationsService {
       },
     });
   }
+
+  listMyReservations(userId: string) {
+    return this.prisma.reservation.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        event: {
+          include: { location: true },
+        },
+      },
+    });
+  }
 }

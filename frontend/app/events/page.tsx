@@ -1,28 +1,25 @@
-const mockEvents = [
-  {
-    id: "design-sprint",
-    title: "Atelier Design Sprint",
-    date: "12 févr 2026",
-    location: "Casablanca",
-    seats: 12,
-  },
-  {
-    id: "tech-ai",
-    title: "Conférence Tech & AI",
-    date: "14 févr 2026",
-    location: "Rabat",
-    seats: 8,
-  },
-  {
-    id: "product-meetup",
-    title: "Meetup Produit",
-    date: "16 févr 2026",
-    location: "Tanger",
-    seats: 4,
-  },
-];
+import { apiGet } from "../../lib/api";
+import type { EventItem } from "../../lib/types";
 
-export default function EventsPage() {
+export const dynamic = "force-dynamic";
+
+async function getEvents() {
+  try {
+    return await apiGet<EventItem[]>("/events");
+  } catch {
+    return [];
+  }
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return "Date à confirmer";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date à confirmer";
+  return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+export default async function EventsPage() {
+  const events = await getEvents();
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-12">
       <header className="mb-10">
@@ -33,20 +30,25 @@ export default function EventsPage() {
         </p>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {mockEvents.map((event) => (
+      {events.length === 0 ? (
+        <div className="rounded-3xl border border-white/70 bg-white/80 p-8 text-slate-600 shadow-lg shadow-slate-900/5">
+          Aucun événement disponible pour le moment.
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2">
+          {events.map((event) => (
           <article
             key={event.id}
             className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-900/5"
           >
             <div className="flex items-center justify-between">
               <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                {event.seats} places restantes
+                {event.remainingCapacity ?? event.capacityMax} places restantes
               </span>
-              <span className="text-xs font-semibold text-slate-500">{event.date}</span>
+              <span className="text-xs font-semibold text-slate-500">{formatDate(event.startAt)}</span>
             </div>
             <h2 className="mt-4 text-2xl font-semibold text-slate-900">{event.title}</h2>
-            <p className="mt-2 text-sm text-slate-600">{event.location}</p>
+            <p className="mt-2 text-sm text-slate-600">{event.location?.name ?? "Lieu à confirmer"}</p>
             <div className="mt-6 flex items-center gap-3">
               <a
                 href={`/events/${event.id}`}
@@ -59,8 +61,9 @@ export default function EventsPage() {
               </button>
             </div>
           </article>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

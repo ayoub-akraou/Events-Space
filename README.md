@@ -21,12 +21,14 @@ Plateforme de gestion d'événements avec authentification, rôles, réservation
    npm install
    npx prisma generate
    npx prisma migrate deploy
+   # optionnel: PORT=3001 pour éviter le conflit avec Next.js
    npm run start:dev
    ```
 4. **Frontend**
    ```bash
    cd frontend
    npm install
+   # optionnel: NEXT_PUBLIC_API_URL=http://localhost:3001
    npm run dev
    ```
 
@@ -38,6 +40,8 @@ Un exemple minimal (à placer dans `backend/.env` ou à la racine) :
 DATABASE_URL=postgresql://admin:admin@127.0.0.1:5433/events_space
 JWT_SECRET=dev_super_secret_change_me
 JWT_EXPIRES_IN=1h
+PORT=3001
+CORS_ORIGINS=http://localhost:3000
 ```
 
 Pour Docker :
@@ -47,6 +51,12 @@ POSTGRES_DB=events_space
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin
 POSTGRES_PORT=5433
+```
+
+Frontend (optionnel) :
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ## Scripts principaux

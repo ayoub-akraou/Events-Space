@@ -1,17 +1,39 @@
+import { notFound } from "next/navigation";
+import { apiGet } from "../../../lib/api";
+import type { EventItem } from "../../../lib/types";
+
+export const dynamic = "force-dynamic";
+
 type EventDetailProps = {
   params: { id: string };
 };
 
-export default function EventDetailPage({ params }: EventDetailProps) {
-  const event = {
-    title: "Atelier Design Sprint",
-    date: "12 févr 2026 · 09:00 - 17:00",
-    location: "Casablanca",
-    address: "Technopark, Rue Ghandi",
-    seats: 12,
-    description:
-      "Un atelier intensif pour aligner équipes produit, design et business autour d'un prototype actionnable.",
-  };
+async function getEvent(id: string) {
+  try {
+    return await apiGet<EventItem>(`/events/${id}`);
+  } catch {
+    return null;
+  }
+}
+
+function formatDateTime(value?: string | null) {
+  if (!value) return "À confirmer";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "À confirmer";
+  return date.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export default async function EventDetailPage({ params }: EventDetailProps) {
+  const event = await getEvent(params.id);
+  if (!event) {
+    notFound();
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-12">
@@ -22,18 +44,25 @@ export default function EventDetailPage({ params }: EventDetailProps) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-semibold text-slate-900">{event.title}</h1>
-            <p className="mt-2 text-sm text-slate-600">{event.date}</p>
+            <p className="mt-2 text-sm text-slate-600">
+              {formatDateTime(event.startAt)}
+              {event.endAt ? ` - ${formatDateTime(event.endAt)}` : ""}
+            </p>
           </div>
           <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-700">
-            {event.seats} places restantes
+            {event.remainingCapacity ?? event.capacityMax} places restantes
           </span>
         </div>
-        <p className="mt-6 text-base leading-relaxed text-slate-600">{event.description}</p>
+        <p className="mt-6 text-base leading-relaxed text-slate-600">
+          {event.description ?? "Aucune description disponible pour cet événement."}
+        </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl bg-slate-50 px-4 py-3">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Lieu</p>
-            <p className="text-lg font-semibold text-slate-900">{event.location}</p>
-            <p className="text-sm text-slate-600">{event.address}</p>
+            <p className="text-lg font-semibold text-slate-900">
+              {event.location?.name ?? "Lieu à confirmer"}
+            </p>
+            <p className="text-sm text-slate-600">{event.location?.addressLine ?? ""}</p>
           </div>
           <div className="rounded-2xl bg-slate-50 px-4 py-3">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Référence</p>

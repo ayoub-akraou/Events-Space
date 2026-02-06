@@ -26,4 +26,11 @@ export class EventsController {
   update(@Param('id', new ParseUUIDPipe()) id: string, @Body() dto: UpdateEventDto) {
     return this.events.updateEvent(id, dto);
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Post(':id/publish')
+  publish(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.events.publishEvent(id);
+  }
 }

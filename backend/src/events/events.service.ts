@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { EventStatus } from '@prisma/client';
 
 @Injectable()
 export class EventsService {
@@ -80,6 +81,23 @@ export class EventsService {
         capacityMax: true,
         updatedAt: true,
         locationId: true,
+      },
+    });
+  }
+
+  publishEvent(eventId: string) {
+    return this.prisma.event.update({
+      where: { id: eventId },
+      data: {
+        status: EventStatus.PUBLISHED,
+        publishedAt: new Date(),
+        canceledAt: null,
+      },
+      select: {
+        id: true,
+        status: true,
+        publishedAt: true,
+        updatedAt: true,
       },
     });
   }

@@ -24,9 +24,12 @@ export default function Home() {
           <button className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400">
             Connexion
           </button>
-          <button className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5">
+          <a
+            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5"
+            href="/register"
+          >
             Créer un compte
-          </button>
+          </a>
         </div>
       </header>
 

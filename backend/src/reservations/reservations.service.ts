@@ -1,7 +1,8 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { EventStatus, ReservationStatus } from '@prisma/client';
+import { AdminDecisionDto } from './dto/admin-decision.dto';
 
 @Injectable()
 export class ReservationsService {
@@ -57,6 +58,41 @@ export class ReservationsService {
           include: { location: true },
         },
       },
+    });
+  }
+
+  async confirmReservation(reservationId: string, adminId: string, dto: AdminDecisionDto) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+      include: { event: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Réservation introuvable');
+    }
+    if (reservation.status !== ReservationStatus.PENDING) {
+      throw new BadRequestException('Réservation non confirmable');
+    }
+    if (reservation.event.status !== EventStatus.PUBLISHED) {
+      throw new BadRequestException('Événement indisponible');
+    }
+
+    const confirmedCount = await this.prisma.reservation.count({
+      where: { eventId: reservation.eventId, status: ReservationStatus.CONFIRMED },
+    });
+    if (confirmedCount >= reservation.event.capacityMax) {
+      throw new ConflictException('Capacité maximale atteinte');
+    }
+
+    return this.prisma.reservation.update({
+      where: { id: reservationId },
+      data: {
+        status: ReservationStatus.CONFIRMED,
+        confirmedAt: new Date(),
+        decidedById: adminId,
+        adminNote: dto.adminNote,
+      },
+      include: { event: true, user: true },
     });
   }
 }

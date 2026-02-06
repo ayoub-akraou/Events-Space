@@ -70,6 +70,17 @@ export class ReservationsService {
     });
   }
 
+  listAllReservations(status?: ReservationStatus) {
+    return this.prisma.reservation.findMany({
+      where: status ? { status } : undefined,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        event: { include: { location: true } },
+        user: true,
+      },
+    });
+  }
+
   async confirmReservation(reservationId: string, adminId: string, dto: AdminDecisionDto) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },

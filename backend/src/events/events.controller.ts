@@ -51,6 +51,13 @@ export class EventsController {
     return this.events.cancelEvent(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('admin')
+  listAdmin() {
+    return this.events.listAllEvents();
+  }
+
   @Get()
   listPublished() {
     return this.events.listPublishedEvents();

@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { ReservationsModule } from './reservations/reservations.module';
 import { StatsModule } from './stats/stats.module';
+import { LocationsModule } from './locations/locations.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
@@ -23,6 +24,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     EventsModule,
     ReservationsModule,
     StatsModule,
+    LocationsModule,
     ThrottlerModule.forRoot({
       throttlers: [
         {

@@ -1,10 +1,21 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { ReservationStatus, Role } from '@prisma/client';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { AdminDecisionDto } from './dto/admin-decision.dto';
 import { CancelReservationDto } from './dto/cancel-reservation.dto';
@@ -26,6 +37,22 @@ export class ReservationsController {
   @Get('me')
   listMine(@CurrentUser() user: CurrentUserPayload) {
     return this.reservations.listMyReservations(user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get()
+  listAll(@Query('status') status?: string) {
+    if (!status) {
+      return this.reservations.listAllReservations();
+    }
+
+    const valid = (Object.values(ReservationStatus) as string[]).includes(status);
+    if (!valid) {
+      throw new BadRequestException('Statut invalide');
+    }
+
+    return this.reservations.listAllReservations(status as ReservationStatus);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

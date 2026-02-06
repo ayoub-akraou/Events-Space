@@ -168,4 +168,36 @@ export class EventsService {
       remainingCapacity: event.capacityMax - confirmedCount,
     };
   }
+
+  async listAllEvents() {
+    const events = await this.prisma.event.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { location: true },
+    });
+
+    const eventIds = events.map((event) => event.id);
+    const counts = eventIds.length
+      ? await this.prisma.reservation.groupBy({
+          by: ['eventId'],
+          where: {
+            eventId: { in: eventIds },
+            status: 'CONFIRMED',
+          },
+          _count: { _all: true },
+        })
+      : [];
+
+    const confirmedByEvent = new Map<string, number>(
+      counts.map((count) => [count.eventId, count._count._all]),
+    );
+
+    return events.map((event) => {
+      const confirmed = confirmedByEvent.get(event.id) ?? 0;
+      return {
+        ...event,
+        confirmedReservations: confirmed,
+        remainingCapacity: event.capacityMax - confirmed,
+      };
+    });
+  }
 }

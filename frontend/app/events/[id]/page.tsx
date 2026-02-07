@@ -7,7 +7,8 @@ import ReserveAction from "./ReserveAction";
 export const dynamic = "force-dynamic";
 
 type EventDetailProps = {
-  params: { id: string };
+  // In recent Next versions, `params` can be a Promise in Server Components.
+  params: Promise<{ id: string }> | { id: string };
 };
 
 async function getEvent(id: string) {
@@ -32,7 +33,8 @@ function formatDateTime(value?: string | null) {
 }
 
 export default async function EventDetailPage({ params }: EventDetailProps) {
-  const event = await getEvent(params.id);
+  const { id } = await params;
+  const event = await getEvent(id);
   if (!event) {
     notFound();
   }
@@ -70,7 +72,7 @@ export default async function EventDetailPage({ params }: EventDetailProps) {
           </div>
           <div className="rounded-2xl bg-slate-50 px-4 py-3">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Reference</p>
-            <p className="text-lg font-semibold text-slate-900">EVT-{params.id.toUpperCase()}</p>
+            <p className="text-lg font-semibold text-slate-900">EVT-{id.toUpperCase()}</p>
             <p className="text-sm text-slate-600">Ouvert aux participants inscrits</p>
           </div>
         </div>
@@ -84,4 +86,3 @@ export default async function EventDetailPage({ params }: EventDetailProps) {
     </div>
   );
 }
-

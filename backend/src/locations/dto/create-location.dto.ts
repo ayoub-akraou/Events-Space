@@ -20,4 +20,3 @@ export class CreateLocationDto {
   @IsString()
   notes?: string;
 }
-

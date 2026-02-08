@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getApiBase } from "../../lib/api";
 
 export type AuthUser = {
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchMe = async (jwt: string) => {
+  const fetchMe = useCallback(async (jwt: string) => {
     const res = await fetch(`${apiBase}/auth/me`, {
       headers: { Authorization: `Bearer ${jwt}` },
     });
@@ -38,9 +38,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const data = (await res.json()) as AuthUser;
     setUser(data);
-  };
+  }, [apiBase]);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const jwt = window.localStorage.getItem(TOKEN_KEY);
     if (!jwt) {
       setToken(null);
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(null);
       setUser(null);
     }
-  };
+  }, [fetchMe]);
 
   useEffect(() => {
     (async () => {
@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const login: AuthContextValue["login"] = async (email, password) => {
+  const login: AuthContextValue["login"] = useCallback(async (email, password) => {
     setIsLoading(true);
     try {
       const res = await fetch(`${apiBase}/auth/login`, {
@@ -89,17 +89,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiBase, fetchMe]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     window.localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
-  };
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({ token, user, isLoading, login, logout, refresh }),
-    [token, user, isLoading],
+    [token, user, isLoading, login, logout, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -7,11 +7,10 @@ export default function ReservationsPage() {
         <p className="text-xs uppercase tracking-[0.35em] text-slate-500">Espace participant</p>
         <h1 className="text-4xl font-semibold text-slate-900">Mes reservations</h1>
         <p className="mt-3 text-base text-slate-600">
-          Suis l'avancement de tes demandes et telecharge tes tickets confirmes.
+          Suis l&apos;avancement de tes demandes et telecharge tes tickets confirmes.
         </p>
       </header>
       <ReservationsClient />
     </div>
   );
 }
-

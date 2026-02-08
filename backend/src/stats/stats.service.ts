@@ -23,9 +23,15 @@ export class StatsService {
         where: { status: EventStatus.PUBLISHED, startAt: { gt: now } },
       }),
       this.prisma.reservation.count(),
-      this.prisma.reservation.count({ where: { status: ReservationStatus.CONFIRMED } }),
-      this.prisma.reservation.count({ where: { status: ReservationStatus.PENDING } }),
-      this.prisma.reservation.count({ where: { status: ReservationStatus.CANCELED } }),
+      this.prisma.reservation.count({
+        where: { status: ReservationStatus.CONFIRMED },
+      }),
+      this.prisma.reservation.count({
+        where: { status: ReservationStatus.PENDING },
+      }),
+      this.prisma.reservation.count({
+        where: { status: ReservationStatus.CANCELED },
+      }),
     ]);
 
     return {
@@ -59,7 +65,8 @@ export class StatsService {
 
     return events.map((event) => {
       const confirmed = confirmedByEvent.get(event.id) ?? 0;
-      const fillRate = event.capacityMax > 0 ? confirmed / event.capacityMax : 0;
+      const fillRate =
+        event.capacityMax > 0 ? confirmed / event.capacityMax : 0;
 
       return {
         eventId: event.id,

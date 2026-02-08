@@ -39,7 +39,7 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
       <div className="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-xl shadow-slate-900/5">
         <h2 className="text-2xl font-semibold text-slate-900">Acces interdit</h2>
         <p className="mt-2 text-sm text-slate-600">
-          Tu n'as pas les droits pour acceder aux pages admin.
+          Tu n&apos;as pas les droits pour acceder aux pages admin.
         </p>
         <Link
           className="mt-6 inline-flex rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700"
@@ -53,4 +53,3 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-

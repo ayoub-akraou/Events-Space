@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  ParseUUIDPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,7 +29,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Patch(':id/role')
-  updateRole(@Param('id', new ParseUUIDPipe()) id: string, @Body() dto: UpdateRoleDto) {
+  updateRole(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: UpdateRoleDto,
+  ) {
     return this.users.updateRole(id, dto.role);
   }
 }

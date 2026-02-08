@@ -19,7 +19,9 @@ export class EventsService {
       throw new BadRequestException('Date de fin invalide');
     }
     if (endAt && endAt < startAt) {
-      throw new BadRequestException('La date de fin doit être après la date de début');
+      throw new BadRequestException(
+        'La date de fin doit être après la date de début',
+      );
     }
 
     return this.prisma.event.create({
@@ -58,7 +60,9 @@ export class EventsService {
       throw new BadRequestException('Date de fin invalide');
     }
     if (startAt && endAt && endAt < startAt) {
-      throw new BadRequestException('La date de fin doit être après la date de début');
+      throw new BadRequestException(
+        'La date de fin doit être après la date de début',
+      );
     }
 
     return this.prisma.event.update({
@@ -145,7 +149,8 @@ export class EventsService {
 
     return events.map((event) => ({
       ...event,
-      remainingCapacity: event.capacityMax - (confirmedByEvent.get(event.id) ?? 0),
+      remainingCapacity:
+        event.capacityMax - (confirmedByEvent.get(event.id) ?? 0),
     }));
   }
 

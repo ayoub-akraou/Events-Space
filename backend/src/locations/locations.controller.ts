@@ -24,4 +24,3 @@ export class LocationsController {
     return this.locations.create(dto);
   }
 }
-

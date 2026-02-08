@@ -7,4 +7,3 @@ import { LocationsService } from './locations.service';
   providers: [LocationsService],
 })
 export class LocationsModule {}
-

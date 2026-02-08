@@ -29,7 +29,10 @@ export class ReservationsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() dto: CreateReservationDto, @CurrentUser() user: CurrentUserPayload) {
+  create(
+    @Body() dto: CreateReservationDto,
+    @CurrentUser() user: CurrentUserPayload,
+  ) {
     return this.reservations.createReservation(dto, user.userId);
   }
 
@@ -47,7 +50,9 @@ export class ReservationsController {
       return this.reservations.listAllReservations();
     }
 
-    const valid = (Object.values(ReservationStatus) as string[]).includes(status);
+    const valid = (Object.values(ReservationStatus) as string[]).includes(
+      status,
+    );
     if (!valid) {
       throw new BadRequestException('Statut invalide');
     }
@@ -108,7 +113,9 @@ export class ReservationsController {
     doc.fontSize(24).text('Ticket de réservation', { align: 'center' });
     doc.moveDown();
     doc.fontSize(12).text(`Code: ${reservation.ticketCode}`);
-    doc.text(`Participant: ${reservation.user.fullName ?? reservation.user.email}`);
+    doc.text(
+      `Participant: ${reservation.user.fullName ?? reservation.user.email}`,
+    );
     doc.text(`Email: ${reservation.user.email}`);
     doc.moveDown();
     doc.text(`Événement: ${event.title}`);

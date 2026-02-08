@@ -81,7 +81,11 @@ export class ReservationsService {
     });
   }
 
-  async confirmReservation(reservationId: string, adminId: string, dto: AdminDecisionDto) {
+  async confirmReservation(
+    reservationId: string,
+    adminId: string,
+    dto: AdminDecisionDto,
+  ) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
       include: { event: true },
@@ -98,7 +102,10 @@ export class ReservationsService {
     }
 
     const confirmedCount = await this.prisma.reservation.count({
-      where: { eventId: reservation.eventId, status: ReservationStatus.CONFIRMED },
+      where: {
+        eventId: reservation.eventId,
+        status: ReservationStatus.CONFIRMED,
+      },
     });
     if (confirmedCount >= reservation.event.capacityMax) {
       throw new ConflictException('Capacité maximale atteinte');
@@ -116,7 +123,11 @@ export class ReservationsService {
     });
   }
 
-  async refuseReservation(reservationId: string, adminId: string, dto: AdminDecisionDto) {
+  async refuseReservation(
+    reservationId: string,
+    adminId: string,
+    dto: AdminDecisionDto,
+  ) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
       select: { id: true, status: true },

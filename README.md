@@ -71,6 +71,14 @@ Frontend :
 
 - `npm run dev` : mode développement
 - `npm run build` : build Next.js
+- `npm run lint` : lint ESLint
+
+## CI/CD (GitHub Actions)
+
+Workflows :
+
+- `.github/workflows/ci.yml` : lint + tests + build (backend + frontend) sur PR et sur `main`
+- `.github/workflows/e2e.yml` : e2e backend avec Postgres (sur `main` + manuel via workflow_dispatch)
 
 ## Endpoints clés (backend)
 
